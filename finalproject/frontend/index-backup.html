@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PT. Topline Evergreen Manufacturing - Dashboard</title>
+    <meta name="description" content="Dashboard Monitoring PT. Topline Evergreen Manufacturing">
+    <link rel="icon" type="image/x-icon" href="assets/images/favicon.ico">
+    
+    <!-- External CSS Files -->
+    <link rel="stylesheet" href="assets/css/global.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/index.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="company-info">
+                <h1 class="company-title">PT. TOPLINE EVERGREEN</h1>
+                <p class="company-desc">Manufacturing Dashboard</p>
+            </div>
+            <div class="header-actions">
+                <div class="status-indicator">
+                    <span class="status-dot"></span>
+                    Live Data
+                </div>
+                <a href="pages/login.html" class="btn-login">
+                    🔐 Login
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dashboard -->
+    <main class="dashboard-main">
+        <div class="dashboard-container">
+            <!-- Page Header -->
+            <div class="page-header">
+                <h1>Dashboard Monitoring</h1>
+                <p>Real-time monitoring keluar masuk barang, status mesin injection, dan achievement per customer</p>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Keluar Masuk Barang Table -->
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <div class="section-icon">📦</div>
+                            <h2>Keluar Masuk Barang</h2>
+                            <span class="section-period">Hari Ini</span>
+                        </div>
+                        <div class="section-filter">
+                            <select id="filterType" class="filter-select">
+                                <option value="all">Semua</option>
+                                <option value="in">Barang Masuk</option>
+                                <option value="out">Barang Keluar</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="barangTable">
+                            <thead>
+                                <tr>
+                                    <th>Part Number</th>
+                                    <th>Model</th>
+                                    <th>Description</th>
+                                    <th>Lot Number</th>
+                                    <th>Quantity</th>
+                                    <th>Type</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody id="barangTableBody">
+                                <!-- Data akan diisi oleh JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Status Mesin Grid -->
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <div class="section-icon">⚙️</div>
+                            <h2>Status Mesin Injection</h2>
+                            <span class="section-period">Real-time</span>
+                        </div>
+                        <div class="section-filter">
+                            <select id="filterMesin" class="filter-select">
+                                <option value="all">Semua Mesin</option>
+                                <option value="running">Running</option>
+                                <option value="stopped">Stopped</option>
+                                <option value="maintenance">Maintenance</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="mesinTable">
+                            <thead>
+                                <tr>
+                                    <th>Kode Mesin</th>
+                                    <th>Spesifikasi</th>
+                                    <th>Running Produk</th>
+                                    <th>Status</th>
+                                    <th>Achievement</th>
+                                    <th>Waktu</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mesinTableBody">
+                                <!-- Data akan diisi oleh JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                                <div class="status-label">Mesin Running</div>
+                            </div>
+                        </div>
+                        <div class="mesin-status-card stopped">
+                            <div class="status-icon">🔴</div>
+                            <div class="status-info">
+                                <div class="status-number" id="mesinStop">0</div>
+                                <div class="status-label">Mesin Stop</div>
+                            </div>
+                        </div>
+                        <div class="mesin-status-card maintenance">
+                            <div class="status-icon">�</div>
+                </div>
+
+                <!-- Achievement per Customer Table -->
+                <div class="dashboard-section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <div class="section-icon">🎯</div>
+                            <h2>Achievement per Customer</h2>
+                            <span class="section-period">Bulan Ini</span>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table" id="achievementTable">
+                            <thead>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Target</th>
+                                    <th>Actual</th>
+                                    <th>Achievement</th>
+                                    <th>Status</th>
+                                    <th>Progress</th>
+                                </tr>
+                            </thead>
+                            <tbody id="achievementTableBody">
+                                <!-- Data akan diisi oleh JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Watermark -->
+    <div class="watermark">
+        PT. Topline Evergreen Manufacturing 2025
+    </div>
+
+    <script>
+        // Data master untuk simulasi
+        const partNumbers = ['PN-001', 'PN-002', 'PN-003', 'PN-004', 'PN-005', 'PN-006'];
+        const models = ['Model-A', 'Model-B', 'Model-C', 'Model-D', 'Model-E'];
+        const descriptions = ['Housing Part', 'Connector Component', 'Switch Assembly', 'Cable Harness', 'Control Unit'];
+        
+        // Data mesin injection
+        const mesinData = [
+            { kode: 'A01', spesifikasi: 'Power Jet 300 Ton', status: 'running' },
+            { kode: 'A02', spesifikasi: 'Power Jet 300 Ton', status: 'running' },
+            { kode: 'A03', spesifikasi: 'Power Jet 300 Ton', status: 'stopped' },
+            { kode: 'A04', spesifikasi: 'Power Jet 300 Ton', status: 'running' },
+            { kode: 'A05', spesifikasi: 'Power Jet 300 Ton', status: 'maintenance' },
+            { kode: 'A06', spesifikasi: 'Power Jet 300 Ton', status: 'running' },
+            { kode: 'A07', spesifikasi: 'Power Jet 300 Ton', status: 'running' },
+            { kode: 'A08', spesifikasi: 'Power Jet 300 Ton', status: 'stopped' },
+            { kode: 'A09', spesifikasi: 'Power Jet 300 Ton', status: 'running' },
+            { kode: 'A10', spesifikasi: 'Power Jet 300 Ton', status: 'maintenance' },
+            { kode: 'A11', spesifikasi: 'Power Jet 300 Ton', status: 'running' },
+            { kode: 'A12', spesifikasi: 'Power Jet 300 Ton', status: 'running' },
+            { kode: 'A13', spesifikasi: 'Power Jet 300 Ton', status: 'stopped' }
+        ];
+        
+        // Data customer achievement
+        const customerData = [
+            { name: 'PT. ASKI', target: 1000, achievement: 30 },
+            { name: 'PT. ARKHA', target: 800, achievement: 70 },
+            { name: 'PT. API', target: 1200, achievement: 85 },
+            { name: 'PT. DSI', target: 900, achievement: 100 },
+            { name: 'PT. YID', target: 750, achievement: 80 }
+        ];
+
+        // Generate data barang masuk/keluar
+        function generateBarangData() {
+            const data = [];
+            for (let i = 0; i < 10; i++) {
+                const isIncoming = Math.random() > 0.5;
+                const partNumber = partNumbers[Math.floor(Math.random() * partNumbers.length)];
+                const model = models[Math.floor(Math.random() * models.length)];
+                const description = descriptions[Math.floor(Math.random() * descriptions.length)];
+                const lotNumber = 'LOT' + new Date().getFullYear() + String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+                const quantity = Math.floor(Math.random() * 500) + 50;
+                const time = new Date(Date.now() - Math.random() * 8 * 60 * 60 * 1000);
+
+                data.push({
+                    partNumber,
+                    model,
+                    description,
+                    lotNumber,
+                    quantity,
+                    type: isIncoming ? 'in' : 'out',
+                    time: time.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                });
+            }
+            return data.sort((a, b) => b.time.localeCompare(a.time));
+        }
+
+        // Update tabel barang
+        function updateBarangTable() {
+            const data = generateBarangData();
+            const tbody = document.getElementById('barangTableBody');
+            const filter = document.getElementById('filterType').value;
+            
+            const filteredData = filter === 'all' ? data : data.filter(item => item.type === filter);
+            
+            tbody.innerHTML = '';
+            filteredData.forEach(item => {
+                const row = document.createElement('tr');
+                row.className = item.type === 'in' ? 'row-incoming' : 'row-outgoing';
+                row.innerHTML = `
+                    <td><strong>${item.partNumber}</strong></td>
+                    <td>${item.model}</td>
+                    <td>${item.description}</td>
+                    <td>${item.lotNumber}</td>
+                    <td class="${item.type === 'in' ? 'quantity-in' : 'quantity-out'}">${item.quantity}</td>
+                    <td><span class="type-badge ${item.type}">${item.type === 'in' ? 'Masuk' : 'Keluar'}</span></td>
+                    <td>${item.time}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Update tabel mesin injection
+        function updateMesinTable() {
+            const tbody = document.getElementById('mesinTableBody');
+            const filter = document.getElementById('filterMesin').value;
+            
+            // Generate random data untuk setiap mesin
+            const mesinTableData = mesinData.map(mesin => {
+                // Random status based on initial status with some variation
+                const statuses = ['running', 'stopped', 'maintenance'];
+                let currentStatus = mesin.status;
+                
+                // 10% chance to change status
+                if (Math.random() < 0.1) {
+                    currentStatus = statuses[Math.floor(Math.random() * statuses.length)];
+                }
+                
+                // Random running product
+                const runningProduct = currentStatus === 'running' ? 
+                    descriptions[Math.floor(Math.random() * descriptions.length)] : 
+                    currentStatus === 'maintenance' ? 'Under Maintenance' : 'Idle';
+                
+                // Random achievement percentage
+                const achievement = currentStatus === 'running' ? 
+                    Math.floor(Math.random() * 40) + 60 : // 60-100%
+                    currentStatus === 'maintenance' ? 0 :
+                    Math.floor(Math.random() * 30) + 10; // 10-40%
+                
+                // Random time
+                const now = new Date();
+                const randomMinutes = Math.floor(Math.random() * 480); // 0-8 hours ago
+                const time = new Date(now.getTime() - randomMinutes * 60000);
+                
+                return {
+                    ...mesin,
+                    status: currentStatus,
+                    runningProduct,
+                    achievement,
+                    time: time.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                };
+            });
+            
+            // Filter data based on selected filter
+            const filteredData = filter === 'all' ? mesinTableData : 
+                mesinTableData.filter(item => item.status === filter);
+            
+            tbody.innerHTML = '';
+            filteredData.forEach(mesin => {
+                const row = document.createElement('tr');
+                row.className = `row-${mesin.status}`;
+                
+                const statusBadge = getStatusBadge(mesin.status);
+                const achievementClass = getAchievementClass(mesin.achievement);
+                
+                row.innerHTML = `
+                    <td><strong>${mesin.kode}</strong></td>
+                    <td>${mesin.spesifikasi}</td>
+                    <td>${mesin.runningProduct}</td>
+                    <td>${statusBadge}</td>
+                    <td><span class="achievement-percentage ${achievementClass}">${mesin.achievement}%</span></td>
+                    <td>${mesin.time}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Get status badge for mesin
+        function getStatusBadge(status) {
+            switch(status) {
+                case 'running':
+                    return '<span class="status-badge excellent">🟢 Running</span>';
+                case 'stopped':
+                    return '<span class="status-badge poor">🔴 Stopped</span>';
+                case 'maintenance':
+                    return '<span class="status-badge warning">🟡 Maintenance</span>';
+                default:
+                    return '<span class="status-badge">Unknown</span>';
+            }
+        }
+        
+        // Get achievement class based on percentage
+        function getAchievementClass(achievement) {
+            if (achievement >= 90) return 'excellent';
+            if (achievement >= 70) return 'good';
+            if (achievement >= 50) return 'warning';
+            return 'poor';
+        }
+
+        // Update tabel achievement customer
+        function updateAchievementTable() {
+            const tbody = document.getElementById('achievementTableBody');
+            tbody.innerHTML = '';
+
+            customerData.forEach(customer => {
+                const actual = Math.floor((customer.target * customer.achievement) / 100);
+                const status = customer.achievement >= 90 ? 'excellent' : 
+                              customer.achievement >= 70 ? 'good' : 
+                              customer.achievement >= 50 ? 'warning' : 'poor';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${customer.name}</strong></td>
+                    <td>${customer.target.toLocaleString()}</td>
+                    <td>${actual.toLocaleString()}</td>
+                    <td><span class="achievement-percentage ${status}">${customer.achievement}%</span></td>
+                    <td><span class="status-badge ${status}">${getStatusText(status)}</span></td>
+                    <td>
+                        <div class="progress-bar">
+                            <div class="progress-fill ${status}" style="width: ${customer.achievement}%"></div>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function getStatusText(status) {
+            switch(status) {
+                case 'excellent': return 'Excellent';
+                case 'good': return 'Good';
+                case 'warning': return 'Warning';
+                case 'poor': return 'Poor';
+                default: return 'Unknown';
+            }
+        }
+
+        // Event listeners
+        document.getElementById('filterType').addEventListener('change', updateBarangTable);
+        document.getElementById('filterMesin').addEventListener('change', updateMesinTable);
+
+        // Status indicator animation
+        setInterval(() => {
+            const dot = document.querySelector('.status-dot');
+            if (dot) {
+                dot.style.opacity = '0.5';
+                setTimeout(() => {
+                    dot.style.opacity = '1';
+                }, 500);
+            }
+        }, 2000);
+
+        // Initialize dashboard
+        function initializeDashboard() {
+            updateBarangTable();
+            updateMesinTable();
+            updateAchievementTable();
+        }
+
+        // Update data setiap 30 detik
+        initializeDashboard();
+        setInterval(() => {
+            updateBarangTable();
+            updateMesinTable();
+        }, 30000);
+
+        // Update achievement setiap 2 menit
+        setInterval(updateAchievementTable, 120000);
+
+        console.log('📊 Dashboard PT. Topline Evergreen loaded successfully');
+        console.log('📦 Barang tracking active');
+        console.log('⚙️ Mesin injection table monitoring active');
+        console.log('🎯 Customer achievement tracking active');
+    </script>
+</body>
+</html>
